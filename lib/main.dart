@@ -50,7 +50,7 @@ void displayProducts() {
     return;
   }
   for (var p in Product.products) {
-    print('${p.id} - ${p.name} - ${p.image} - \$${p.price}');
+    print('${p.id} - ${p.name} - ${p.image} - ${p.price}(VND)');
   }
 }
 
@@ -96,7 +96,7 @@ void searchByName() {
     print('Khong tim thay san pham nao!');
   } else {
     for (var p in results) {
-      print('${p.id} - ${p.name} - ${p.image} - \$${p.price}');
+      print('${p.id} - ${p.name} - ${p.image} - ${p.price}(VND)');
     }
   }
 }
@@ -108,7 +108,9 @@ void findById() {
   if (product == null) {
     print('Khong tim thay san pham!');
   } else {
-    print('${product.id} - ${product.name} - ${product.image} - \$${product.price}');
+    print(
+      '${product.id} - ${product.name} - ${product.image} - ${product.price}(VND)',
+    );
   }
 }
 
@@ -116,6 +118,6 @@ void increasePrice() {
   var increased = Product.increasePrice();
   print('Danh sach sau khi tang gia 10%:');
   for (var p in increased) {
-    print('${p.id} - ${p.name} - \$${p.price.toStringAsFixed(2)}');
+    print('${p.id} - ${p.name} - ${p.price.toStringAsFixed(2)}(VND)');
   }
 }
