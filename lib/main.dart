@@ -1,65 +1,121 @@
-import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'Product.dart';
+import 'dart:io';
+import 'models/product.dart';
 
 void main() {
-  print('=== DEMO PRODUCT OPERATIONS ===\n');
+  while (true) {
+    print('\n=== MENU ===');
+    print('1. Hien thi danh sach san pham');
+    print('2. Them san pham moi');
+    print('3. Sua san pham');
+    print('4. Tim kiem theo ten');
+    print('5. Tim theo id');
+    print('6. Tang gia 10%');
+    print('0. Thoat');
+    print('Nhap lua chon: ');
 
-  Product.displayAll();
+    String? input = stdin.readLineSync();
+    int? choice = int.tryParse(input ?? '');
 
-  print('--- Test Add ---');
-  Product.add(Product(id: 'P006', name: 'Monitor', image: 'monitor.png', price: 299.99));
-  Product.displayAll();
-
-  print('--- Test Edit ---');
-  Product.Edit('P001', name: 'Gaming Laptop', price: 1299.99);
-  Product.displayAll();
-
-  print('--- Test Search By Name ---');
-  List<Product> searchResults = Product.SearchByName('phone');
-  for (var p in searchResults) {
-    print('Found: ${p.name} - \$${p.price}');
+    switch (choice) {
+      case 1:
+        displayProducts();
+        break;
+      case 2:
+        addProduct();
+        break;
+      case 3:
+        editProduct();
+        break;
+      case 4:
+        searchByName();
+        break;
+      case 5:
+        findById();
+        break;
+      case 6:
+        increasePrice();
+        break;
+      case 0:
+        print('Ket thuc!');
+        return;
+      default:
+        print('Lua chon khong hop le!');
+    }
   }
-
-  print('\n--- Test Search By Price Range ---');
-  List<Product> priceResults = Product.SearchByPriceRange(100, 600);
-  for (var p in priceResults) {
-    print('Found: ${p.name} - \$${p.price}');
-  }
-
-  print('\n--- Test Find ---');
-  Product? found = Product.Find('P003');
-  if (found != null) {
-    print('Found: ${found.name} - \$${found.price}');
-  }
-
-  print('\n--- Test increasePrice 10% ---');
-  Product.increasePrice(10);
-  Product.displayAll();
-
-  print('--- Test Factory fromJson ---');
-  String jsonString = '{"id":"P007","name":"Tablet","image":"tablet.png","price":449.99}';
-  Product tablet = Product.fromJson(jsonDecode(jsonString));
-  print('From JSON: ${tablet.name} - \$${tablet.price}');
-
-  print('\n=== ALL TESTS COMPLETED ===');
-
-  runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+void displayProducts() {
+  if (Product.products.isEmpty) {
+    print('Danh sach trong!');
+    return;
+  }
+  for (var p in Product.products) {
+    print('${p.id} - ${p.name} - ${p.image} - \$${p.price}');
+  }
+}
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'PRM Lab 1',
-      home: Scaffold(
-        appBar: AppBar(title: const Text('PRM Lab 1 - Product Demo')),
-        body: const Center(
-          child: Text('Check console for product operations output'),
-        ),
-      ),
-    );
+void addProduct() {
+  print('Nhap id: ');
+  int id = int.parse(stdin.readLineSync()!);
+  print('Nhap ten: ');
+  String name = stdin.readLineSync()!;
+  print('Nhap image: ');
+  String image = stdin.readLineSync()!;
+  print('Nhap gia: ');
+  double price = double.parse(stdin.readLineSync()!);
+
+  Product.add(Product(id: id, name: name, image: image, price: price));
+  print('Da them san pham!');
+}
+
+void editProduct() {
+  print('Nhap id san pham can sua: ');
+  int id = int.parse(stdin.readLineSync()!);
+  Product? existing = Product.findById(id);
+  if (existing == null) {
+    print('Khong tim thay san pham!');
+    return;
+  }
+
+  print('Nhap ten moi (hien tai: ${existing.name}): ');
+  String name = stdin.readLineSync()!;
+  print('Nhap image moi (hien tai: ${existing.image}): ');
+  String image = stdin.readLineSync()!;
+  print('Nhap gia moi (hien tai: ${existing.price}): ');
+  double price = double.parse(stdin.readLineSync()!);
+
+  Product.edit(Product(id: id, name: name, image: image, price: price));
+  print('Da sua san pham!');
+}
+
+void searchByName() {
+  print('Nhap ten can tim: ');
+  String name = stdin.readLineSync()!;
+  var results = Product.searchByName(name);
+  if (results.isEmpty) {
+    print('Khong tim thay san pham nao!');
+  } else {
+    for (var p in results) {
+      print('${p.id} - ${p.name} - ${p.image} - \$${p.price}');
+    }
+  }
+}
+
+void findById() {
+  print('Nhap id can tim: ');
+  int id = int.parse(stdin.readLineSync()!);
+  var product = Product.findById(id);
+  if (product == null) {
+    print('Khong tim thay san pham!');
+  } else {
+    print('${product.id} - ${product.name} - ${product.image} - \$${product.price}');
+  }
+}
+
+void increasePrice() {
+  var increased = Product.increasePrice();
+  print('Danh sach sau khi tang gia 10%:');
+  for (var p in increased) {
+    print('${p.id} - ${p.name} - \$${p.price.toStringAsFixed(2)}');
   }
 }
