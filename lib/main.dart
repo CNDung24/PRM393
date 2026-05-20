@@ -1,6 +1,14 @@
 import 'dart:io';
 import 'models/product.dart';
 
+List<Product> products = [
+  Product(id: 1, name: 'Ao thun', image: 'ao_thun.png', price: 150000),
+  Product(id: 2, name: 'Quan jean', image: 'quan_jean.png', price: 350000),
+  Product(id: 3, name: 'Giay the thao', image: 'giay.png', price: 500000),
+  Product(id: 4, name: 'Mu luoi trai', image: 'mu.png', price: 80000),
+  Product(id: 5, name: 'Tui xach', image: 'tui_xach.png', price: 250000),
+];
+
 void main() {
   while (true) {
     print('\n=== MENU ===');
@@ -45,11 +53,11 @@ void main() {
 }
 
 void displayProducts() {
-  if (Product.products.isEmpty) {
+  if (products.isEmpty) {
     print('Danh sach trong!');
     return;
   }
-  for (var p in Product.products) {
+  for (var p in products) {
     print('${p.id} - ${p.name} - ${p.image} - ${p.price}(VND)');
   }
 }
@@ -64,19 +72,20 @@ void addProduct() {
   print('Nhap gia: ');
   double price = double.parse(stdin.readLineSync()!);
 
-  Product.add(Product(id: id, name: name, image: image, price: price));
+  products.add(Product(id: id, name: name, image: image, price: price));
   print('Da them san pham!');
 }
 
 void editProduct() {
   print('Nhap id san pham can sua: ');
   int id = int.parse(stdin.readLineSync()!);
-  Product? existing = Product.findById(id);
-  if (existing == null) {
+  int index = products.indexWhere((p) => p.id == id);
+  if (index == -1) {
     print('Khong tim thay san pham!');
     return;
   }
 
+  Product existing = products[index];
   print('Nhap ten moi (hien tai: ${existing.name}): ');
   String name = stdin.readLineSync()!;
   print('Nhap image moi (hien tai: ${existing.image}): ');
@@ -84,14 +93,16 @@ void editProduct() {
   print('Nhap gia moi (hien tai: ${existing.price}): ');
   double price = double.parse(stdin.readLineSync()!);
 
-  Product.edit(Product(id: id, name: name, image: image, price: price));
+  products[index] = Product(id: id, name: name, image: image, price: price);
   print('Da sua san pham!');
 }
 
 void searchByName() {
   print('Nhap ten can tim: ');
   String name = stdin.readLineSync()!;
-  var results = Product.searchByName(name);
+  var results = products
+      .where((p) => p.name.toLowerCase().contains(name.toLowerCase()))
+      .toList();
   if (results.isEmpty) {
     print('Khong tim thay san pham nao!');
   } else {
@@ -104,20 +115,29 @@ void searchByName() {
 void findById() {
   print('Nhap id can tim: ');
   int id = int.parse(stdin.readLineSync()!);
-  var product = Product.findById(id);
-  if (product == null) {
-    print('Khong tim thay san pham!');
-  } else {
+  try {
+    var product = products.firstWhere((p) => p.id == id);
     print(
       '${product.id} - ${product.name} - ${product.image} - ${product.price}(VND)',
     );
+  } catch (e) {
+    print('Khong tim thay san pham!');
   }
 }
 
 void increasePrice() {
-  var increased = Product.increasePrice();
+  products = products
+      .map(
+        (p) => Product(
+          id: p.id,
+          name: p.name,
+          image: p.image,
+          price: p.price * 1.1,
+        ),
+      )
+      .toList();
   print('Danh sach sau khi tang gia 10%:');
-  for (var p in increased) {
+  for (var p in products) {
     print('${p.id} - ${p.name} - ${p.price.toStringAsFixed(2)}(VND)');
   }
 }
